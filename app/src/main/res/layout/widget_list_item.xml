@@ -2,18 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="16dp"
+    android:layout_marginTop="@dimen/margin_5"
+    android:layout_marginBottom="@dimen/margin_5"
     android:paddingRight="16dp">
 
     <TextView
         android:id="@+id/stock_symbol"
-        style="@style/StockSymbolTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
+        android:textAllCaps="true"
+        android:textSize="@dimen/textsize_15"
         tools:text="GOOG" />
 
     <LinearLayout
@@ -24,10 +27,10 @@
 
         <TextView
             android:id="@+id/bid_price"
-            style="@style/BidPriceTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="10sp"
+            android:textSize="@dimen/textsize_12"
             tools:text="1000.00" />
 
         <TextView
@@ -38,6 +41,7 @@
             android:background="@drawable/percent_change_pill"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
+            android:textSize="@dimen/textsize_12"
             tools:text="100%" />
     </LinearLayout>
 </LinearLayout>

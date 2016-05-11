@@ -48,27 +48,4 @@ public class WidgetActivity extends AppWidgetProvider {
         remoteViews.setEmptyView(R.id.lvWidget, R.id.empty_view);
         return remoteViews;
     }
-
-    /*public static PendingIntent buildButtonPendingIntent(Context context) {
-        ++MyWidgetIntentReceiver.clickCount;
-
-        // initiate widget update request
-        Intent intent = new Intent();
-        intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
-        return PendingIntent.getBroadcast(context, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
-    }*/
-
-    /*private static CharSequence getDesc() {
-        return "Sync to see some of our funniest joke collections";
-    }
-
-    private static CharSequence getTitle() {
-        return "Funny Jokes";
-    }
-
-    public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
-        ComponentName myWidget = new ComponentName(context,WidgetActivity.class);
-        AppWidgetManager manager = AppWidgetManager.getInstance(context);
-        manager.updateAppWidget(myWidget, remoteViews);
-    }*/
 }

@@ -32,16 +32,20 @@ public class Utils {
         jsonObject = jsonObject.getJSONObject("query");
         int count = StringUtils.getInt(jsonObject.getString("count"));
         if (count == 1){
-          jsonObject = jsonObject.getJSONObject("results")
-              .getJSONObject("quote");
-          batchOperations.add(buildBatchOperation(jsonObject));
+          jsonObject = jsonObject.getJSONObject("results").getJSONObject("quote");
+          //batchOperations.add(buildBatchOperation(jsonObject));
+          ContentProviderOperation operation = buildBatchOperation(jsonObject);
+          if(operation != null)
+            batchOperations.add(operation);
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
 
           if (resultsArray != null && resultsArray.length() != 0){
             for (int i = 0; i < resultsArray.length(); i++){
               jsonObject = resultsArray.getJSONObject(i);
-              batchOperations.add(buildBatchOperation(jsonObject));
+              ContentProviderOperation operation = buildBatchOperation(jsonObject);
+              if(operation != null)
+                batchOperations.add(operation);
             }
           }
         }
@@ -78,30 +82,23 @@ public class Utils {
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
         QuoteProvider.Quotes.CONTENT_URI);
     try {
-      String change = jsonObject.getString("Change");
-      builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
+      if(!TextUtils.isEmpty(jsonObject.getString("Bid")) && !jsonObject.getString("Bid").equalsIgnoreCase("null") &&
+              !TextUtils.isEmpty(jsonObject.getString("ChangeinPercent")) && !jsonObject.getString("ChangeinPercent").equalsIgnoreCase("null") &&
+              !TextUtils.isEmpty(jsonObject.getString("Change")) && !jsonObject.getString("Change").equalsIgnoreCase("null")) {
 
-      if(!TextUtils.isEmpty(jsonObject.getString("Bid")) && !jsonObject.getString("Bid").equalsIgnoreCase("null"))
+        String change = jsonObject.getString("Change");
+        builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
         builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
-      else
-        builder.withValue(QuoteColumns.BIDPRICE, 0);
-
-      if(!TextUtils.isEmpty(jsonObject.getString("ChangeinPercent")) && !jsonObject.getString("ChangeinPercent").equalsIgnoreCase("null"))
         builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(jsonObject.getString("ChangeinPercent"), true));
-      else
-        builder.withValue(QuoteColumns.PERCENT_CHANGE, 0);
-
-      if(!TextUtils.isEmpty(change) && !change.equalsIgnoreCase("null"))
         builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
-      else
-        builder.withValue(QuoteColumns.CHANGE, 0);
-
-      builder.withValue(QuoteColumns.ISCURRENT, 1);
-      if (change.charAt(0) == '-'){
-        builder.withValue(QuoteColumns.ISUP, 0);
-      }else{
-        builder.withValue(QuoteColumns.ISUP, 1);
-      }
+        builder.withValue(QuoteColumns.ISCURRENT, 1);
+        if (change.charAt(0) == '-'){
+          builder.withValue(QuoteColumns.ISUP, 0);
+        }else{
+          builder.withValue(QuoteColumns.ISUP, 1);
+        }
+      } else
+          return null;
 
     } catch (JSONException e){
       e.printStackTrace();

@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -11,11 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.sam_chordas.android.stockhawk.DataObject.StockDO;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperAdapter;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperViewHolder;
+import com.sam_chordas.android.stockhawk.ui.StockDetailActivity;
 
 /**
  * Created by sam_chordas on 10/6/15.
@@ -44,31 +47,43 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
   @Override
   public void onBindViewHolder(final ViewHolder viewHolder, final Cursor cursor){
-    viewHolder.symbol.setText(cursor.getString(cursor.getColumnIndex("symbol")));
-    viewHolder.bidPrice.setText(cursor.getString(cursor.getColumnIndex("bid_price")));
+    final StockDO objStockDO          = new StockDO();
+    objStockDO.symbol           = cursor.getString(cursor.getColumnIndex("symbol"));
+    objStockDO.bid_price        = cursor.getString(cursor.getColumnIndex("bid_price"));
+    objStockDO.percent_change   = cursor.getString(cursor.getColumnIndex("percent_change"));
+    objStockDO.change           = cursor.getString(cursor.getColumnIndex("change"));
+
+    viewHolder.symbol.setText(objStockDO.symbol);
+    viewHolder.bidPrice.setText(objStockDO.bid_price);
+
     int sdk = Build.VERSION.SDK_INT;
     if (cursor.getInt(cursor.getColumnIndex("is_up")) == 1){
       if (sdk < Build.VERSION_CODES.JELLY_BEAN){
-        viewHolder.change.setBackgroundDrawable(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
+        viewHolder.change.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }else {
-        viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
+        viewHolder.change.setBackground(mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }
     } else{
       if (sdk < Build.VERSION_CODES.JELLY_BEAN) {
-        viewHolder.change.setBackgroundDrawable(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
+        viewHolder.change.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       } else{
-        viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
+        viewHolder.change.setBackground(mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       }
     }
     if (Utils.showPercent){
-      viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("percent_change")));
+      viewHolder.change.setText(objStockDO.percent_change);
     } else{
-      viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("change")));
+      viewHolder.change.setText(objStockDO.change);
     }
+
+    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(mContext,StockDetailActivity.class);
+        intent.putExtra("StockDO",objStockDO);
+        mContext.startActivity(intent);
+      }
+    });
   }
 
   @Override public void onItemDismiss(int position) {
@@ -83,13 +98,14 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     return super.getItemCount();
   }
 
-  public static class ViewHolder extends RecyclerView.ViewHolder
-      implements ItemTouchHelperViewHolder, View.OnClickListener{
+  public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder, View.OnClickListener{
+    public final View mView;
     public final TextView symbol;
     public final TextView bidPrice;
     public final TextView change;
     public ViewHolder(View itemView){
       super(itemView);
+      mView = itemView;
       symbol = (TextView) itemView.findViewById(R.id.stock_symbol);
       symbol.setTypeface(robotoLight);
       bidPrice = (TextView) itemView.findViewById(R.id.bid_price);

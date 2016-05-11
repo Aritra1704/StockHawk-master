@@ -41,7 +41,6 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     public ListProvider(Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-
     }
 
     @Override
@@ -119,7 +118,7 @@ public class ListProvider implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
 
-        RemoteViews remoteView = new RemoteViews(context.getPackageName(), R.layout.list_item_quote);
+        RemoteViews remoteView = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
         StockDO objStockDO = arrStockDO.get(position);
         remoteView.setTextViewText(R.id.stock_symbol, objStockDO.symbol);
         remoteView.setTextViewText(R.id.bid_price, objStockDO.bid_price);
