@@ -24,14 +24,12 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
     }
 
     private void updateWidgetPictureAndButtonListener(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                R.layout.widget_cell);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_cell);
 
         // updating view
         remoteViews.setTextViewText(R.id.title, getTitle());
 
-        WidgetActivity.pushWidgetUpdate(context.getApplicationContext(),
-                remoteViews);
+        //WidgetActivity.pushWidgetUpdate(context.getApplicationContext(), remoteViews);
     }
 
     private String getDesc(Context context) {
