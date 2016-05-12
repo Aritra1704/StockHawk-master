@@ -1,5 +1,9 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -7,14 +11,24 @@ import android.support.v7.app.AppCompatActivity;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.sam_chordas.android.stockhawk.DataObject.StockDO;
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.Utilities.StringUtils;
+import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+
+import java.util.ArrayList;
 
 /**
  * Created by Aritra on 5/11/2016.
  */
-public class StockDetailActivity extends AppCompatActivity {
+public class StockDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     //http://www.android-graphview.org/documentation/how-to-create-a-simple-graph
+
+    private StockDO objStockDO;
+    private GraphView graph;
+    private static final int CURSOR_LOADER_ID = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,14 +36,39 @@ public class StockDetailActivity extends AppCompatActivity {
 
         setContentView(R.layout.stock_detail);
 
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        graph.addSeries(series);
+        if(getIntent().hasExtra("StockDO"))
+            objStockDO = (StockDO)getIntent().getExtras().get("StockDO");
+
+        graph = (GraphView) findViewById(R.id.graph);
+
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args){
+        // This narrows the return to only the stocks that are most current.
+        return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
+                new String[]{ QuoteColumns.BIDPRICE },
+                QuoteColumns.SYMBOL + " = ?",
+                new String[]{objStockDO.symbol},
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data){
+        if(data != null && data.moveToFirst()){
+            DataPoint[] objDataPoint = new DataPoint[data.getCount()];
+            int i = 0;
+            do{
+                objDataPoint[i] = new DataPoint(i++,StringUtils.getDouble(data.getString(data.getColumnIndex(QuoteColumns.BIDPRICE))));
+            }while(data.moveToNext());
+
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(objDataPoint);
+            graph.addSeries(series);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader){
     }
 }
