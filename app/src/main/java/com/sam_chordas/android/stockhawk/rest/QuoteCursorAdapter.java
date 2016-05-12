@@ -75,15 +75,6 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     } else{
       viewHolder.change.setText(objStockDO.change);
     }
-
-    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(mContext,StockDetailActivity.class);
-        intent.putExtra("StockDO",objStockDO);
-        mContext.startActivity(intent);
-      }
-    });
   }
 
   @Override public void onItemDismiss(int position) {

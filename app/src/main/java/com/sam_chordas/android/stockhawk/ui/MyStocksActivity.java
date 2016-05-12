@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.sam_chordas.android.stockhawk.DataObject.StockDO;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.Utilities.NetworkUtils;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
@@ -35,6 +36,8 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
+
+import java.util.ArrayList;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -79,11 +82,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
-                //TODO:
-                // do something on item click
+                StockDO objStockDO = arrStockDO.get(position);
+                if(objStockDO != null){
+
+                  Intent intent = new Intent(mContext,StockDetailActivity.class);
+                  intent.putExtra("StockDO",objStockDO);
+                  mContext.startActivity(intent);
+                }
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
+
 
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -204,11 +213,23 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         new String[]{"1"},
         null);
   }
-
+private ArrayList<StockDO> arrStockDO;
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
-    mCursorAdapter.swapCursor(data);
-    mCursor = data;
+    if(data != null && data.moveToFirst()){
+      arrStockDO = new ArrayList<>();
+      do{
+        final StockDO objStockDO          = new StockDO();
+        objStockDO.symbol           = data.getString(data.getColumnIndex("symbol"));
+        objStockDO.bid_price        = data.getString(data.getColumnIndex("bid_price"));
+        objStockDO.percent_change   = data.getString(data.getColumnIndex("percent_change"));
+        objStockDO.change           = data.getString(data.getColumnIndex("change"));
+        arrStockDO.add(objStockDO);
+
+      }while(data.moveToNext());
+      mCursorAdapter.swapCursor(data);
+      mCursor = data;
+    }
   }
 
   @Override
