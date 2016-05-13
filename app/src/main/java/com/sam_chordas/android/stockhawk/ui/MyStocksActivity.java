@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.Gravity;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.DataObject.StockDO;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.Utilities.NetworkUtils;
@@ -34,7 +36,6 @@ import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
-import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
 import java.util.ArrayList;
@@ -55,13 +56,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
+  private Toolbar toolbar;
   //boolean isConnected;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
-    setContentView(R.layout.activity_my_stocks);
+    setContentView(R.layout.activity_main);
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
     mServiceIntent = new Intent(this, StockIntentService.class);
@@ -74,6 +76,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         networkToast();
       }
     }
+
+    toolbar                 = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -111,7 +117,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                       new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
                       new String[] { input.toString() }, null);
                   if (c.getCount() != 0) {
-                    Toast toast = Toast.makeText(MyStocksActivity.this, "This stock is already saved!",Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(MyStocksActivity.this, getString(R.string.stock_already_saved),Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
                     return;
@@ -169,10 +175,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   }
 
   public void restoreActionBar() {
-    ActionBar actionBar = getSupportActionBar();
-    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-    actionBar.setDisplayShowTitleEnabled(true);
-    actionBar.setTitle(mTitle);
+    //ActionBar actionBar = getSupportActionBar();
+    //toolbar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+    //toolbar.setDisplayShowTitleEnabled(true);
+    toolbar.setTitle(mTitle);
   }
 
   @Override

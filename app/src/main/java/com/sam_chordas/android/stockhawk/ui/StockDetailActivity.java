@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -29,6 +30,7 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
     private StockDO objStockDO;
     private GraphView graph;
     private static final int CURSOR_LOADER_ID = 1;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +42,9 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
             objStockDO = (StockDO)getIntent().getExtras().get("StockDO");
 
         graph = (GraphView) findViewById(R.id.graph);
+        toolbar                 = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getTitle());
+        setSupportActionBar(toolbar);
 
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
